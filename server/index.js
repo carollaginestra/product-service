@@ -7,13 +7,15 @@ require('dotenv').config({ path: '../.env' });
 const { send, json } = require('micro');
 const { router, get, post } = require('microrouter');
 const mongoose = require('mongoose');
+mongoose.connect(
+    `mongodb+srv://RgiNordATeraDIT:UCC2g8PWQf2tK37@products-service-noukn.mongodb.net/products`,
+    { useNewUrlParser: true },
+);
 
+
+// Models
 const Product = require('./models/product');
 
-mongoose.connect(
-    `mongodb://RgiNordATeraDIT:UCC2g8PWQf2tK37@products-service-shard-00-00-noukn.mongodb.net:27017,products-service-shard-00-01-noukn.mongodb.net:27017,products-service-shard-00-02-noukn.mongodb.net:27017/test?ssl=true&replicaSet=products-service-shard-0&authSource=admin&retryWrites=true`,
-    { useNewUrlParser: true, dbName: 'products' },
-);
 
 const getProducts = (req, res) => {
     return send(res, 200, [
@@ -72,7 +74,9 @@ const createProduct = async (req, res) => {
 
         return send(res, 201, data);
     } catch (err) {
-        return send(res, 403, err);
+        console.log(err);
+
+        return send(res, 400, err);
     }
 };
 
