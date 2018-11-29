@@ -5,7 +5,8 @@
 require('dotenv').config({ path: '../.env' });
 
 const { send, json } = require('micro');
-const { router, get, post } = require('microrouter');
+const validation = require('micro-joi');
+const { router, get, post, put, del123456 } = require('microrouter');
 const mongoose = require('mongoose');
 mongoose.connect(
     `mongodb+srv://RgiNordATeraDIT:UCC2g8PWQf2tK37@products-service-noukn.mongodb.net/products`,
@@ -18,67 +19,58 @@ const Product = require('./models/product');
 
 
 const getProducts = (req, res) => {
-    return send(res, 200, [
-        {
-            id: new Date().valueOf(),
-            category: 'Blusa',
-            title: 'Regata',
-            image: 'http://...',
-            price: Math.random() * 2000,
-        },
-        {
-            id: new Date().valueOf(),
-            category: 'Blusa',
-            title: 'Regata',
-            image: 'http://...',
-            price: Math.random() * 2000,
-        },
-        {
-            id: new Date().valueOf(),
-            category: 'Blusa',
-            title: 'Regata',
-            image: 'http://...',
-            price: Math.random() * 2000,
-        },
-        {
-            id: new Date().valueOf(),
-            category: 'Blusa',
-            title: 'Regata',
-            image: 'http://...',
-            price: Math.random() * 2000,
-        },
-        {
-            id: new Date().valueOf(),
-            category: 'Blusa',
-            title: 'Regata',
-            image: 'http://...',
-            price: Math.random() * 2000,
-        },
-        {
-            id: new Date().valueOf(),
-            category: 'Blusa',
-            title: 'Regata',
-            image: 'http://...',
-            price: Math.random() * 2000,
-        },
-    ]);
+    Product.findAll({})
+            .then(result => 
+                    response.status(200).json(result)
+                )
+            .catch(err =>
+                    response.status(412).send('Nenhum Produto Cadastrado')
+                );
 };
 
 const createProduct = async (req, res) => {
     try {
         const body = await json(req);
 
-        const data = new Product({ ...body });
+        const product = new Product({ ...body });
 
-        await data.save();
+        await product.save();
 
-        return send(res, 201, data);
+        return send(res, 201, product);
     } catch (err) {
         console.log(err);
 
         return send(res, 400, err);
     }
 };
+
+const updateProducts = (req, res) => {
+
+    const id = req.params.id;
+
+    Product.findById(id)
+    .then( product => {
+        if (!product){
+            res.status(404).send('produto não encontrado')
+        } else {
+            return product.update({
+                title, category, price, image
+            })
+            .then(()=>{
+                res.status(200).json(product)
+            })
+        }
+    })
+    .catch(err=>{
+        console.log(err);
+        
+        return send(res, 400, err);
+    })
+};
+
+const deleteProducts = (req, res) => {
+
+}
 
 const notFound = (req, res) => {
     return 'No routes found.';
@@ -87,6 +79,8 @@ const notFound = (req, res) => {
 const app = router(
     get('/products', getProducts),
     post('/products', createProduct),
+    put('/products/:id', updateProducts),
+    del('/products/:id', deleteProducts),
     get('/*', notFound),
 );
 
