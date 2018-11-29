@@ -5,7 +5,6 @@
 require('dotenv').config({ path: '../.env' });
 
 const { send, json } = require('micro');
-const validation = require('micro-joi');
 const { router, get, post, put, del123456 } = require('microrouter');
 const mongoose = require('mongoose');
 mongoose.connect(
@@ -21,10 +20,10 @@ const Product = require('./models/product');
 const getProducts = (req, res) => {
     Product.findAll({})
             .then(result => 
-                    response.status(200).json(result)
+                    res.status(200).json(result)
                 )
             .catch(err =>
-                    response.status(412).send('Nenhum Produto Cadastrado')
+                    res.status(412).send('Nenhum Produto Cadastrado')
                 );
 };
 
@@ -69,7 +68,24 @@ const updateProducts = (req, res) => {
 };
 
 const deleteProducts = (req, res) => {
+    const id = req.params.id;
 
+    Product.destroy({
+        where: {
+            id: id
+        }
+    })
+    .then(deletados => {
+        if(deletados > 0) {
+            res.status(204).send();
+        } else {
+            res.status(404).send("Produto deletado");
+        }
+    })
+    .catch(err => {
+        console.log(err);
+        res.status(412).send("Não foi possivel deletar o produto")
+    })
 }
 
 const notFound = (req, res) => {
