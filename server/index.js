@@ -5,7 +5,7 @@
 require('dotenv').config({ path: '../.env' });
 
 const { send, json } = require('micro');
-const { router, get, post, put, del123456 } = require('microrouter');
+const { router, get, post, put, del } = require('microrouter');
 const mongoose = require('mongoose');
 mongoose.connect(
     `mongodb+srv://RgiNordATeraDIT:UCC2g8PWQf2tK37@products-service-noukn.mongodb.net/products`,
